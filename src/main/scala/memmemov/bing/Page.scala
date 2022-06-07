@@ -8,17 +8,13 @@ class Page(
   private val level: Int
 ):
 
-  private lazy val level = 0
-
   private lazy val lines = new Array[Line](256)
-
-  private lazy val parent = new Page()
 
   private lazy val children = new Array[Option[Page]](256)
 
-  def content(address: List[UByte]): UByte = ???
+  def content(address: Address): UByte = ???
 
-  def write(address: List[UByte], content: UByte): Unit = ???
+  def write(address: Address, content: UByte): Unit = ???
 
   def close(): Unit = ???
 

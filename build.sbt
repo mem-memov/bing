@@ -8,7 +8,7 @@ import scala.scalanative.build._
 nativeConfig ~= {
   _.withLTO(LTO.thin)
     .withMode(Mode.debug)
-    .withGC(GC.none)
+    .withGC(GC.default)
 }
 
 enablePlugins(ScalaNativePlugin)
