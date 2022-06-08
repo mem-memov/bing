@@ -2,6 +2,17 @@ package memmemov.bing
 
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
+sealed trait ShorterAddress
+case class ShorterLong(index: UByte, shorter: Address) extends ShorterAddress
+case class ShorterDouble(index: UByte, shorter: Address) extends ShorterAddress
+case class ShorterSingle(index: UByte, shorter: Address) extends ShorterAddress
+case class ShorterEmpty(index: UByte, shorter: Address) extends ShorterAddress
+
+sealed trait IsContentWritten
+object ContentNotWrittenTooBig extends IsContentWritten
+object ContentNotWrittenTooSmall extends IsContentWritten
+object ContentWritten extends IsContentWritten
+
 class Address(
   private[Address] val indices: List[UByte]
 ):
@@ -10,7 +21,7 @@ class Address(
 
   def trimBig(): Address =
     new Address(indices.dropWhile(_ == 0.toUByte))
-    
+
   def padBig(n: Int): Address = ???
 
   def group(count: Int): List[Address] =
@@ -40,29 +51,32 @@ class Address(
   def equals(another: Address): Boolean =
     another.indices == this.indices
 
-  def optionalContent(lines: Array[Line]): Option[UByte] =
-    if length == 2 then
-      val first = indices.head
-      val second = indices.drop(1).head
-      Option(lines(first.toInt).content(second))
-    else
-      Option.empty
+  def isWritten(block: Block, content: UByte): Address.IsContentWritten =
+    length match
+      case 0 =>
+        Address.ContentNotWrittenTooSmall
+      case 1 =>
+        block.write(indices.head, content)
+        Address.ContentWritten
+      case _ =>
+        Address.ContentNotWrittenTooBig(
+          index = indices.head,
+          shorterAddress = new Address(indices.tail)
+        )
 
-  def isWritten(lines: Array[Line], content: UByte): Boolean =
-    if length == 2 then
-      val first = indices.head
-      val second = indices.drop(1).head
-      lines(first.toInt).write(second, content)
-      true
-    else
-      false
-      
-  def shorterAddress: Option[(UByte, Address)] =
-    if length <= 1 then
-      None
-    else
-      Option((indices.head, new Address(indices.tail)))
-
+  def isRead(block: Block): Address.IsContentRead =
+    length match
+      case 0 =>
+        Address.ContentNotReadAddressEmpty
+      case 1 =>
+        Address.ContentRead(
+          content = block.content(indices.head)
+        )
+      case _ =>
+        Address.ContentNotReadTooBig(
+          index = indices.head,
+          shorterAddress = new Address(indices.tail)
+        )
 
 object Address:
 
@@ -71,3 +85,13 @@ object Address:
       new Address(List(0.toUByte))
     else
       new Address(indices.toList)
+
+  sealed trait IsContentWritten
+  object ContentWritten extends IsContentWritten
+  case class ContentNotWrittenTooBig(index: UByte, shorterAddress: Address) extends IsContentWritten
+  object ContentNotWrittenTooSmall extends IsContentWritten
+
+  sealed trait IsContentRead
+  case class ContentRead(content: UByte) extends IsContentRead
+  object ContentNotReadAddressEmpty extends IsContentRead
+  case class ContentNotReadTooBig(index: UByte, shorterAddress: Address) extends IsContentRead

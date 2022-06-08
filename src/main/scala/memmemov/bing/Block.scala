@@ -4,7 +4,7 @@ import scala.scalanative.libc.stdlib.{free, malloc}
 import scala.scalanative.unsafe.{Ptr, UWord}
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-class Line():
+class Block:
 
   private lazy val bytePointer: Ptr[UByte] = malloc(256.toUByte).asInstanceOf[Ptr[UByte]]
   

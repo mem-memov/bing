@@ -4,10 +4,10 @@ import org.scalatest.funsuite.AnyFunSuite
 
 import scala.scalanative.unsigned.UnsignedRichInt
 
-class LineSuite extends AnyFunSuite:
+class BlockSuite extends AnyFunSuite:
 
-  test("Read a byte from a line") {
-    val line = Line()
+  test("Read a byte from a block") {
+    val block = new Block
     (
       for {
         index <- 0 to 255
@@ -15,9 +15,9 @@ class LineSuite extends AnyFunSuite:
       } yield (index.toUByte, content.toUByte)
     ).foreach {
       case (index, content) =>
-        line.write(index, content)
-        val result = line.content(index)
-        line.close()
+        block.write(index, content)
+        val result = block.content(index)
+        block.close()
         assert(result == content)
     }
   }
