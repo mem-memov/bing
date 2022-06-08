@@ -6,8 +6,12 @@ class Address(
   private[Address] val indices: List[UByte]
 ):
 
+  private val length: Int = indices.length
+
   def trimBig(): Address =
     new Address(indices.dropWhile(_ == 0.toUByte))
+    
+  def padBig(n: Int): Address = ???
 
   def group(count: Int): List[Address] =
     List(this)
@@ -35,6 +39,30 @@ class Address(
 
   def equals(another: Address): Boolean =
     another.indices == this.indices
+
+  def optionalContent(lines: Array[Line]): Option[UByte] =
+    if length == 2 then
+      val first = indices.head
+      val second = indices.drop(1).head
+      Option(lines(first.toInt).content(second))
+    else
+      Option.empty
+
+  def isWritten(lines: Array[Line], content: UByte): Boolean =
+    if length == 2 then
+      val first = indices.head
+      val second = indices.drop(1).head
+      lines(first.toInt).write(second, content)
+      true
+    else
+      false
+      
+  def shorterAddress: Option[(UByte, Address)] =
+    if length <= 1 then
+      None
+    else
+      Option((indices.head, new Address(indices.tail)))
+
 
 object Address:
 
