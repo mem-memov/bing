@@ -2,17 +2,6 @@ package memmemov.bing
 
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-sealed trait ShorterAddress
-case class ShorterLong(index: UByte, shorter: Address) extends ShorterAddress
-case class ShorterDouble(index: UByte, shorter: Address) extends ShorterAddress
-case class ShorterSingle(index: UByte, shorter: Address) extends ShorterAddress
-case class ShorterEmpty(index: UByte, shorter: Address) extends ShorterAddress
-
-sealed trait IsContentWritten
-object ContentNotWrittenTooBig extends IsContentWritten
-object ContentNotWrittenTooSmall extends IsContentWritten
-object ContentWritten extends IsContentWritten
-
 class Address(
   private[Address] val indices: List[UByte]
 ):
