@@ -1,15 +1,15 @@
-package memmemov.bing
+package memmemov.bing.block
 
 import scala.scalanative.libc.stdlib.{free, malloc}
 import scala.scalanative.unsafe.{Ptr, UWord}
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-class Block:
+class Instance:
 
   private lazy val bytePointer: Ptr[UByte] = malloc(256.toUByte).asInstanceOf[Ptr[UByte]]
   
-  def content(index: UByte): UByte = bytePointer(index)
+  def read(where: UByte): UByte = bytePointer(where)
   
-  def write(index: UByte, content: UByte): Unit = bytePointer.update(index, content)
+  def write(where: UByte, what: UByte): Unit = bytePointer.update(where, what)
   
   def close(): Unit = free(bytePointer.asInstanceOf[Ptr[Byte]])

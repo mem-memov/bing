@@ -1,9 +1,11 @@
-package memmemov.bing
+package memmemov.bing.address
 
+import memmemov.bing.address.Instance
 import org.scalatest.funsuite.AnyFunSuite
+
 import scala.scalanative.unsigned.UnsignedRichInt
 
-class AddressSuite extends AnyFunSuite:
+class Suite extends AnyFunSuite:
 
   test("Address gets incremented") {
     List(
@@ -24,7 +26,7 @@ class AddressSuite extends AnyFunSuite:
         List(1.toUByte, 0.toUByte, 0.toUByte)
       ),
     ).foreach{ case(original, expected) =>
-      val address = new Address(original)
-      assert(address.increment == new Address(expected))
+      val address = new Instance(original)
+      assert(address.increment == new Instance(expected))
     }
   }
