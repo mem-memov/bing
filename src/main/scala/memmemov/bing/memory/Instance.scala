@@ -11,14 +11,18 @@ class Instance:
   private val root: element.Instance = new element.Instance(0)
 
   def append(what: address.Instance): Append =
-    val where = next
-    next = next.increment
-
-    root.write(where, what)
-
-    Appended(
-      at = where
-    )
+    if what > next then
+      NotAppended
+    else
+      val results = root.writeAddress(next, what)
+      if results.nonEmpty && results.forall(_ == element.WrittenAddress) then
+        val where = next
+        next = next.increment
+        Appended(
+          at = where
+        )
+      else
+        NotAppended
 
 
 

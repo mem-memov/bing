@@ -3,6 +3,7 @@ package memmemov.bing.element
 import memmemov.bing.address
 import memmemov.bing.block
 
+import scala.annotation.tailrec
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 class Instance(
@@ -26,6 +27,21 @@ class Instance(
           case _ => NotWritten
       case _ => NotWritten
 
+  def writeAddress(where: address.Instance, what: address.Instance): List[WriteAddress] =
+    
+    @tailrec
+    def accumulateResults(where: address.Instance, what: address.Instance, results: List[WriteAddress]): List[WriteAddress] =
+      what.take match
+        case address.NotTakenAddressEmpty =>
+          results
+        case address.Taken(index, shorterAddress) =>
+          this.write(where, index) match
+            case NotWritten =>
+              NotWrittenAddress :: results
+            case Written =>
+              accumulateResults(where.increment, shorterAddress, WrittenAddress :: results)
+
+    accumulateResults(where, what, List.empty[WriteAddress])
 
   def read(where: address.Instance): Read =
     where.read(content) match
@@ -38,11 +54,3 @@ class Instance(
           case _ => NotRead
       case _ => NotRead
 
-  def write(where: address.Instance, what: address.Instance): Unit =
-    what.take match
-      case address.NotTakenAddressEmpty => ()
-      case address.Taken(index, shorterAddress) =>
-        this.write(where, index) match
-          case NotWritten => ()
-          case Written =>
-            write(where.increment, shorterAddress)
