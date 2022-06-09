@@ -12,7 +12,7 @@ class Instance:
 
   def append(what: address.Instance): Append =
     if what > next then
-      NotAppended
+      NotAppendedContentTooBig
     else
       val results = root.writeAddress(next, what)
       if results.nonEmpty && results.forall(_ == element.WrittenAddress) then
@@ -24,7 +24,23 @@ class Instance:
       else
         NotAppended
 
+  def update(where: address.Instance, what: address.Instance): Update =
+    if what > where then
+      NotUpdatedContentTooBig
+    else
+      val results = root.writeAddress(next, what)
+      if results.nonEmpty && results.forall(_ == element.WrittenAddress) then
+        Updated
+      else
+        NotUpdated
 
-
+  def read(where: address.Instance): Read =
+    root.readAddress(where) match
+      case element.ReadAddressResult(what) =>
+        ReadResult(
+          value = what
+        )
+      case element.NotReadAddress =>
+        NotRead
 
 

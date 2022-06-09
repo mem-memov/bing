@@ -27,8 +27,19 @@ class Instance(
           case _ => NotWritten
       case _ => NotWritten
 
+  def read(where: address.Instance): Read =
+    where.read(content) match
+      case address.ReadResult(what) =>
+        ReadResult(what)
+      case address.NotReadAddressTooBig =>
+        where.take match
+          case address.Taken(index, shorterAddress) =>
+            children(index.toInt).read(where)
+          case _ => NotRead
+      case _ => NotRead
+
   def writeAddress(where: address.Instance, what: address.Instance): List[WriteAddress] =
-    
+
     @tailrec
     def accumulateResults(where: address.Instance, what: address.Instance, results: List[WriteAddress]): List[WriteAddress] =
       what.take match
@@ -43,14 +54,4 @@ class Instance(
 
     accumulateResults(where, what, List.empty[WriteAddress])
 
-  def read(where: address.Instance): Read =
-    where.read(content) match
-      case address.ReadResult(what) =>
-        ReadResult(what)
-      case address.NotReadAddressTooBig =>
-        where.take match
-          case address.Taken(index, shorterAddress) =>
-            children(index.toInt).read(where)
-          case _ => NotRead
-      case _ => NotRead
-
+  def readAddress(where: address.Instance): ReadAddress = ???

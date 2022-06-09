@@ -6,7 +6,7 @@ import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 class Instance(
   private[Instance] val indices: List[UByte]
-):
+) extends Ordered[Instance]:
 
   private val length: Int = indices.length
 
@@ -15,9 +15,6 @@ class Instance(
 
   def padBig(n: Int): Instance =
     new Instance(indices.padTo(n, 0.toUByte))
-
-  def group(count: Int): List[Instance] =
-    List(this)
 
   def prepended(index: UByte): Instance =
     new Instance(index :: indices)
@@ -79,3 +76,15 @@ class Instance(
         index = indices.head,
         shorterAddress = new Instance(indices.tail)
       )
+
+  override def compare(that: Instance): Int =
+    val trimmedThis = this.trimBig()
+    val trimmedThat = that.trimBig()
+    if trimmedThis.length != trimmedThat.length then
+      trimmedThis.length - trimmedThat.length
+    else
+      trimmedThis.indices.zipAll(trimmedThat.indices, 0.toUByte, 0.toUByte).dropWhile { case (thisIndex, thatIndex) =>
+        thisIndex == thatIndex
+      } match
+        case Nil => 0
+        case (thisIndex, thatIndex) :: _ => if thisIndex > thatIndex then 1 else -1
