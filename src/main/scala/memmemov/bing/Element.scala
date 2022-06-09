@@ -12,21 +12,27 @@ class Element(
     block.close()
     elements.foreach(_.close())
 
-  def isWritten(address: Address, content: UByte): Element.IsContentWritten = // TODO: read an address instead of a single byte
-    address.isWritten(block, content) match
-      case Address.ContentWritten =>
-        Element.ContentWritten
-      case Address.ContentNotWrittenTooBig(index, shorterAddress) =>
-        elements(index.toInt).isWritten(shorterAddress, content)
-      case _ => Element.ContentNotWritten
+  def isWritten(address: Address, content: Address, count: Int, length: Int): Element.IsContentWritten = // TODO: read an address instead of a single byte
+    content.foreach { i =>
+      address.isWritten(block, i) match
+        case Address.ContentWritten =>
+          Element.ContentWritten
+        case Address.ContentNotWrittenTooBig(index, shorterAddress) =>
+          elements(index.toInt).isWritten(shorterAddress, paddedContent)
+        case _ => Element.ContentNotWritten
+    }
 
-  def isRead(address: Address): Element.IsContentRead = // TODO: read as many siblings as needed for this level
-    address.isRead(block) match
-      case Address.ContentRead(content) =>
-        Element.ContentRead(content)
-      case Address.ContentNotReadTooBig(index, shorterAddress) =>
-        elements(index.toInt).isRead(address)
-      case _ => Element.ContentNotRead
+
+  def isRead(address: Address, content: Address, count: Int, length: Int): Element.IsContentRead = // TODO: read as many siblings as needed for this level
+    (count until length).foldLeft(content) { case (content, _) =>
+      address.isRead(block) match
+        case Address.ContentRead(index) =>
+          Element.ContentRead(content.prepended(index))
+        case Address.ContentNotReadTooBig(index, shorterAddress) =>
+          elements(index.toInt).isRead(address)
+        case _ => Element.ContentNotRead
+    }
+
 
 object Element:
 
@@ -35,5 +41,5 @@ object Element:
   object ContentNotWritten extends IsContentWritten
 
   sealed trait IsContentRead
-  case class ContentRead(content: UByte) extends IsContentRead
+  case class ContentRead(content: Address) extends IsContentRead
   object ContentNotRead extends IsContentRead

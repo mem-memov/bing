@@ -11,10 +11,14 @@ class Address(
   def trimBig(): Address =
     new Address(indices.dropWhile(_ == 0.toUByte))
 
-  def padBig(n: Int): Address = ???
+  def padBig(n: Int): Address =
+    new Address(indices.padTo(n))
 
   def group(count: Int): List[Address] =
     List(this)
+
+  def prepended(index: UByte): Address =
+    new Address(index :: indices)
 
   def increment: Address =
 
@@ -67,6 +71,18 @@ class Address(
           shorterAddress = new Address(indices.tail)
         )
 
+  def foreach(f: UByte => Unit): Unit = indices.foreach(f)
+
+  def isOneTaken(): IsOneTaken =
+    if length == 0 then
+      OneIsNotTakenFromEmpty
+    else
+      OneIsTaken(
+        index = indices.head,
+        shorterAddress = new Address(indices.tail)
+      )
+
+
 object Address:
 
   def apply(indices: UByte*): Address =
@@ -84,3 +100,7 @@ object Address:
   case class ContentRead(content: UByte) extends IsContentRead
   object ContentNotReadAddressEmpty extends IsContentRead
   case class ContentNotReadTooBig(index: UByte, shorterAddress: Address) extends IsContentRead
+
+  sealed trait IsOneTaken
+  object OneIsNotTakenFromEmpty extends IsOneTaken
+  case class OneIsTaken(index: UByte, shorterAddress: Address) extends IsOneTaken
