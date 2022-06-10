@@ -10,7 +10,7 @@ import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 class Instance:
 
   val start: address.Instance =
-    new address.Instance(List(0.toUByte))
+    new address.Instance(List(UByte.MinValue))
 
   private var next: address.Instance = start
   private val root: route.Instance = new route.Instance(

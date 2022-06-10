@@ -11,14 +11,18 @@ class Instance(
   val length: Int = indices.length
 
   def trimBig: Instance =
-    new Instance(indices.dropWhile(_ == 0.toUByte))
+    new Instance(
+      indices.dropWhile(_ == UByte.MinValue)
+    )
 
   def padBig(n: Int): Instance =
-    new Instance(indices.padTo(n, 0.toUByte))
+    new Instance(
+      indices.dropWhile(_ == UByte.MinValue).padTo(n, UByte.MinValue)
+    )
 
   def increment: Instance =
 
-    def plusOne(x: UByte): (UByte, Boolean) = if x == 255.toUByte then (0.toUByte, true) else ((x + 1.toUByte).toUByte, false)
+    def plusOne(x: UByte): (UByte, Boolean) = if x == 255.toUByte then (UByte.MinValue, true) else ((x + 1.toUByte).toUByte, false)
 
     val (accumulator, _, hasOverflow) = indices.reverse.foldLeft((List.empty[UByte], true, false)) {
       case ((accumulator, isStart, hasOverflow), index) =>
@@ -37,8 +41,10 @@ class Instance(
 
     new Instance(resultIndices)
 
-  def equals(another: Instance): Boolean =
-    another.indices == this.indices
+  override def equals(that: Any): Boolean =
+    that match
+      case that: Instance => compare(that) == 0
+      case _ => false
 
   def write(where: block.Instance, what: UByte): Write =
     length match
@@ -78,8 +84,9 @@ class Instance(
     if trimmedThis.length != trimmedThat.length then
       trimmedThis.length - trimmedThat.length
     else
-      trimmedThis.indices.zipAll(trimmedThat.indices, 0.toUByte, 0.toUByte).dropWhile { case (thisIndex, thatIndex) =>
-        thisIndex == thatIndex
-      } match
-        case Nil => 0
-        case (thisIndex, thatIndex) :: _ => if thisIndex > thatIndex then 1 else -1
+      trimmedThis.indices.zipAll(trimmedThat.indices, UByte.MinValue, UByte.MinValue)
+        .dropWhile { case (thisIndex, thatIndex) =>
+          thisIndex == thatIndex
+        } match
+          case Nil => 0
+          case (thisIndex, thatIndex) :: _ => if thisIndex > thatIndex then 1 else -1
