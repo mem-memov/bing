@@ -24,7 +24,8 @@ class Instance(
             case element.Written =>
               accumulateResults(where.increment, shorterAddress, WrittenAddress :: results)
 
-    accumulateResults(where, what, List.empty[WriteAddress])
+    val paddedAddress = what.padBig(where.length)
+    accumulateResults(where, paddedAddress, List.empty[WriteAddress])
 
   def readAddress(where: address.Instance): ReadAddress =
 
