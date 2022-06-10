@@ -11,8 +11,15 @@ import memmemov.bing.{address, memory}
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 val memory = new memory.Instance
-val address = new address.Instance(memory.start)
-memory.append(address)
+val firstAddress = memory.start
+
+memory.append(firstAddress) match
+  case memory.Appended(secondAddress) =>
+    memory.append(secondAddress)
+    ()
+  case _ => 
+    ()
+
 memory.foreach{ a: address.Instance => 
   a.foreach { b: UByte =>
     // use the byte
