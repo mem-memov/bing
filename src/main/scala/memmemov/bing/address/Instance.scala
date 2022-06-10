@@ -16,9 +16,6 @@ class Instance(
   def padBig(n: Int): Instance =
     new Instance(indices.padTo(n, 0.toUByte))
 
-  def prepended(index: UByte): Instance =
-    new Instance(index :: indices)
-
   def increment: Instance =
 
     def plusOne(x: UByte): (UByte, Boolean) = if x == 255.toUByte then (0.toUByte, true) else ((x + 1.toUByte).toUByte, false)
@@ -65,8 +62,6 @@ class Instance(
         NotReadAddressTooBig
 
   def foreach(f: UByte => Unit): Unit = indices.foreach(f)
-
-  def map[A](f: UByte => A): List[A] = indices.map(f)
 
   def take: Take =
     if length == 0 then

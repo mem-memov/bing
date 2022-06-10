@@ -11,8 +11,14 @@ import memmemov.bing.{address, memory}
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 val memory = new memory.Instance
-val address = new address.Instance(List(0.toUByte))
+val address = new address.Instance(memory.start)
 memory.append(address)
+memory.foreach{ a: address.Instance => 
+  a.foreach { b: UByte =>
+    // use the byte
+    ()
+  }
+}
 ```
 
 ```bash
