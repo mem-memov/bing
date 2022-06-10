@@ -9,13 +9,13 @@ import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 class Instance:
 
+  val start: address.Instance =
+    new address.Instance(List(0.toUByte))
+
   private var next: address.Instance = start
   private val root: route.Instance = new route.Instance(
     new element.Instance(0)
   )
-
-  val start: address.Instance =
-    new address.Instance(List(0.toUByte))
 
   def append(what: address.Instance): Append =
     if what > next then
