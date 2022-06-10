@@ -14,7 +14,7 @@ class Instance:
     new element.Instance(0)
   )
 
-  def start: address.Instance =
+  val start: address.Instance =
     new address.Instance(List(0.toUByte))
 
   def append(what: address.Instance): Append =
