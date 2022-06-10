@@ -10,7 +10,7 @@ class Instance(
   private val level: Int
 ):
   private lazy val content: block.Instance = new block.Instance
-  private lazy val children: Array[Instance] = (new Array[Instance](256)).map(_ => new Instance(level + 1))
+  private lazy val children: Array[Instance] = (new Array[Instance](Instance.size)).map(_ => new Instance(level + 1))
   private lazy val addressSize: Int = scala.math.pow(8, level).toInt
 
   def close(): Unit =
@@ -39,3 +39,6 @@ class Instance(
           case _ => NotRead
       case _ => NotRead
 
+object Instance:
+
+  private lazy val size: Int = UByte.MaxValue.toInt + 1

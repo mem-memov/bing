@@ -6,37 +6,50 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 class PadBigSuite extends AnyFunSuite:
+  
+  private val low = UByte.MinValue
+  private val high = UByte.MinValue
 
-  test("Create another address without zero bytes at the head") {
+  test("Create another address with some zero bytes at the head") {
     List(
       (
-        List(UByte.MaxValue),
-        0,
-        List(UByte.MaxValue)
+        new Instance(List(high)),
+        new Instance(List(high)),
+        PaddedBig(new Instance(List(high)))
       ),
       (
-        List(UByte.MaxValue),
-        1,
-        List(UByte.MinValue, UByte.MaxValue)
+        new Instance(List(high)),
+        new Instance(List(high, high)),
+        PaddedBig(new Instance(List(low, high)))
       ),
       (
-        List(UByte.MaxValue),
-        3,
-        List(UByte.MinValue, UByte.MinValue, UByte.MinValue, UByte.MaxValue)
+        new Instance(List(high)),
+        new Instance(List(high, high, high, high)),
+        PaddedBig(new Instance(List(low, low, low, high)))
       ),
       (
-        List(UByte.MinValue, UByte.MinValue, UByte.MinValue, UByte.MaxValue),
-        3,
-        List(UByte.MinValue, UByte.MinValue, UByte.MinValue, UByte.MaxValue)
+        new Instance(List(high, high)),
+        new Instance(List(high)),
+        NotPaddedBigAlreadyGreater
       ),
       (
-        List(UByte.MaxValue, UByte.MinValue),
-        1,
-        List(UByte.MinValue, UByte.MaxValue, UByte.MinValue)
+        new Instance(List()),
+        new Instance(List()),
+        PaddedBig(new Instance(List()))
+      ),
+      (
+        new Instance(List()),
+        new Instance(List(high, high, high, high)),
+        PaddedBig(new Instance(List(low, low, low, low)))
+      ),
+      (
+        new Instance(List()),
+        new Instance(List(low, low, low, high)),
+        PaddedBig(new Instance(List(low)))
       )
-    ).foreach { case (original, n, expected) =>
+    ).foreach { case (original, example, expected) =>
       assert(
-        new Instance(original).padBig(n) == new Instance(expected)
+        original.padBig(example) == expected
       )
     }
   }

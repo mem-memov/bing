@@ -7,31 +7,42 @@ import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 class TrimBigSuite extends AnyFunSuite:
 
+  private val low = UByte.MinValue
+  private val high = UByte.MinValue
+  
   test("Create another address without zero bytes at the head") {
     List(
       (
-        List(UByte.MaxValue),
-        List(UByte.MaxValue)
+        new Instance(List(high)),
+        new Instance(List(high))
       ),
       (
-        List(UByte.MinValue, UByte.MaxValue),
-        List(UByte.MaxValue)
+        new Instance(List(low, high)),
+        new Instance(List(high))
       ),
       (
-        List(UByte.MinValue, UByte.MinValue, UByte.MinValue, UByte.MaxValue),
-        List(UByte.MaxValue)
+        new Instance(List(low, low, low, high)),
+        new Instance(List(high))
       ),
       (
-        List(UByte.MinValue, UByte.MaxValue, UByte.MinValue),
-        List(UByte.MaxValue, UByte.MinValue)
+        new Instance(List(low, high, low)),
+        new Instance(List(high, low))
       ),
       (
-        List(UByte.MaxValue, UByte.MinValue, UByte.MinValue),
-        List(UByte.MaxValue, UByte.MinValue, UByte.MinValue)
+        new Instance(List(high, low, low)),
+        new Instance(List(high, low, low))
+      ),
+      (
+        new Instance(List()),
+        new Instance(List())
+      ),
+      (
+        new Instance(List(low, low, low)),
+        new Instance(List())
       ),
     ).foreach { case (original, expected) =>
       assert(
-        new Instance(original).trimBig == new Instance(expected)
+        original.trimBig == expected
       )
     }
   }

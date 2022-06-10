@@ -15,10 +15,19 @@ class Instance(
       indices.dropWhile(_ == UByte.MinValue)
     )
 
-  def padBig(n: Int): Instance =
-    new Instance(
-      indices.dropWhile(_ == UByte.MinValue).padTo(n, UByte.MinValue)
-    )
+  def padBig(that: Instance): PadBig =
+    val trimmedThis = this.trimBig
+    val trimmedThat = that.trimBig
+    if trimmedThis.length > trimmedThat.length then
+      NotPaddedBigAlreadyGreater
+    else
+      val n = trimmedThis.length - trimmedThat.length
+      PaddedBig(
+        value = new Instance(
+          trimmedThis.indices.padTo(n, UByte.MinValue)
+        )
+      )
+
 
   def increment: Instance =
 

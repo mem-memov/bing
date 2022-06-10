@@ -10,24 +10,24 @@ class IncrementSuite extends AnyFunSuite:
   test("Address gets incremented") {
     List(
       (
-        List(UByte.MinValue),
-        List(1.toUByte)
+        new Instance(List(UByte.MinValue)),
+        new Instance(List(1.toUByte))
       ),
       (
-        List(254.toUByte),
-        List(255.toUByte)
+        new Instance(List(254.toUByte)),
+        new Instance(List(255.toUByte))
       ),
       (
-        List(255.toUByte),
-        List(1.toUByte, UByte.MinValue)
+        new Instance(List(255.toUByte)),
+        new Instance(List(1.toUByte, UByte.MinValue))
       ),
       (
-        List(255.toUByte, 255.toUByte),
-        List(1.toUByte, UByte.MinValue, UByte.MinValue)
+        new Instance(List(255.toUByte, 255.toUByte)),
+        new Instance(List(1.toUByte, UByte.MinValue, UByte.MinValue))
       ),
     ).foreach{ case(original, expected) =>
       assert(
-        new Instance(original).increment == new Instance(expected)
+        original.increment == expected
       )
     }
   }
