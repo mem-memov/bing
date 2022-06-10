@@ -50,11 +50,6 @@ class Instance(
 
     new Instance(resultIndices)
 
-  override def equals(that: Any): Boolean =
-    that match
-      case that: Instance => compare(that) == 0
-      case _ => false
-
   def write(where: block.Instance, what: UByte): Write =
     length match
       case 0 =>
@@ -99,3 +94,8 @@ class Instance(
         } match
           case Nil => 0
           case (thisIndex, thatIndex) :: _ => if thisIndex > thatIndex then 1 else -1
+
+  override def equals(that: Any): Boolean =
+    that match
+      case that: Instance => compare(that) == 0
+      case _ => false
