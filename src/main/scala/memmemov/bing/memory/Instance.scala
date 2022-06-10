@@ -2,20 +2,23 @@ package memmemov.bing.memory
 
 import memmemov.bing.address
 import memmemov.bing.element
+import memmemov.bing.route
 
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 class Instance:
 
   private var next: address.Instance = new address.Instance(List(0.toUByte))
-  private val root: element.Instance = new element.Instance(0)
+  private val root: route.Instance = new route.Instance(
+    new element.Instance(0)
+  )
 
   def append(what: address.Instance): Append =
     if what > next then
       NotAppendedContentTooBig
     else
       val results = root.writeAddress(next, what)
-      if results.nonEmpty && results.forall(_ == element.WrittenAddress) then
+      if results.nonEmpty && results.forall(_ == route.WrittenAddress) then
         val where = next
         next = next.increment
         Appended(
@@ -29,18 +32,18 @@ class Instance:
       NotUpdatedContentTooBig
     else
       val results = root.writeAddress(next, what)
-      if results.nonEmpty && results.forall(_ == element.WrittenAddress) then
+      if results.nonEmpty && results.forall(_ == route.WrittenAddress) then
         Updated
       else
         NotUpdated
 
   def read(where: address.Instance): Read =
     root.readAddress(where) match
-      case element.ReadAddressResult(what) =>
+      case route.ReadAddressResult(what) =>
         ReadResult(
           value = what
         )
-      case element.NotReadAddress =>
+      case route.NotReadAddress =>
         NotRead
 
 

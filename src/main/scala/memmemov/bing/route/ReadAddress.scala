@@ -1,4 +1,4 @@
-package memmemov.bing.element
+package memmemov.bing.route
 
 import memmemov.bing.address
 

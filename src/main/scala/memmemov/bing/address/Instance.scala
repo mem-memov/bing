@@ -8,9 +8,9 @@ class Instance(
   private[Instance] val indices: List[UByte]
 ) extends Ordered[Instance]:
 
-  private val length: Int = indices.length
+  val length: Int = indices.length
 
-  def trimBig(): Instance =
+  def trimBig: Instance =
     new Instance(indices.dropWhile(_ == 0.toUByte))
 
   def padBig(n: Int): Instance =
@@ -78,8 +78,8 @@ class Instance(
       )
 
   override def compare(that: Instance): Int =
-    val trimmedThis = this.trimBig()
-    val trimmedThat = that.trimBig()
+    val trimmedThis = this.trimBig
+    val trimmedThat = that.trimBig
     if trimmedThis.length != trimmedThat.length then
       trimmedThis.length - trimmedThat.length
     else
