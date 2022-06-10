@@ -11,6 +11,7 @@ class Instance(
 ):
   private lazy val content: block.Instance = new block.Instance
   private lazy val children: Array[Instance] = (new Array[Instance](256)).map(_ => new Instance(level + 1))
+  private lazy val addressSize: Int = scala.math.pow(8, level).toInt
 
   def close(): Unit =
     content.close()
@@ -54,4 +55,24 @@ class Instance(
 
     accumulateResults(where, what, List.empty[WriteAddress])
 
-  def readAddress(where: address.Instance): ReadAddress = ???
+  def readAddress(where: address.Instance): ReadAddress =
+
+    @tailrec
+    def accumulateResults(where: address.Instance, countDown: Int, results: List[Option[UByte]]): List[Option[UByte]] =
+      if countDown == 0 then
+        results
+      else
+        this.read(where) match
+          case NotRead =>
+            None :: results
+          case ReadResult(content) =>
+            accumulateResults(where.increment, countDown - 1, Some(content) :: results)
+
+    val results = accumulateResults(where, addressSize, List.empty[Option[UByte]])
+
+    if results.contains(None) then
+      NotReadAddress
+    else
+      ReadAddressResult(
+        value = new address.Instance(results.map(_.get))
+      )
