@@ -1,4 +1,5 @@
 # bing
+### address database
 
 This library provides an in-memory storage of addresses.
 It enables you to send existing addresses to new places in memory.
