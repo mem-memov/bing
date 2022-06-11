@@ -1,21 +1,23 @@
-package memmemov.bing.address
-
-import memmemov.bing.{block, element}
+package memmemov.bing
 
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-class Instance(
-  private[Instance] val indices: List[UByte]
-) extends Ordered[Instance]:
+class Address(
+  private[Address] val indices: List[UByte]
+) extends Ordered[Address]:
 
   val length: Int = indices.length
 
-  def trimBig: Instance =
-    new Instance(
+  def trimBig: Address =
+    new Address(
       indices.dropWhile(_ == UByte.MinValue)
     )
 
-  def padBig(that: Instance): PadBig =
+  sealed trait PadBig
+  case class PaddedBig(value: Address) extends PadBig
+  object NotPaddedBigAlreadyGreater extends PadBig
+
+  def padBig(that: Address): PadBig =
     val trimmedThis = this.trimBig
     val trimmedThat = that.trimBig
     if trimmedThis.length > trimmedThat.length then
@@ -23,13 +25,15 @@ class Instance(
     else
       val n = trimmedThis.length - trimmedThat.length
       PaddedBig(
-        value = new Instance(
+        value = new Address(
           trimmedThis.indices.padTo(n, UByte.MinValue)
         )
       )
 
+  def hasLength(length: Int): Boolean =
+    this.length == length
 
-  def increment: Instance =
+  def increment: Address =
 
     def plusOne(x: UByte): (UByte, Boolean) = if x == 255.toUByte then (UByte.MinValue, true) else ((x + 1.toUByte).toUByte, false)
 
@@ -48,9 +52,14 @@ class Instance(
 
     val resultIndices = if hasOverflow then 1.toUByte :: accumulator.reverse else accumulator.reverse
 
-    new Instance(resultIndices)
+    new Address(resultIndices)
 
-  def write(where: block.Instance, what: UByte): Write =
+  sealed trait Write
+  object Written extends Write
+  object NotWrittenAddressEmpty extends Write
+  object NotWrittenAddressTooBig extends Write
+
+  def write(where: Block, what: UByte): Write =
     length match
       case 0 =>
         NotWrittenAddressEmpty
@@ -60,7 +69,12 @@ class Instance(
       case _ =>
         NotWrittenAddressTooBig
 
-  def read(where: block.Instance): Read =
+  sealed trait Read
+  case class ReadResult(content: UByte) extends Read
+  object NotReadAddressEmpty extends Read
+  object NotReadAddressTooBig extends Read
+
+  def read(where: Block): Read =
     length match
       case 0 =>
         NotReadAddressEmpty
@@ -73,16 +87,29 @@ class Instance(
 
   def foreach(f: UByte => Unit): Unit = indices.foreach(f)
 
-  def take: Take =
+  sealed trait Shorten
+  object NotShortened extends Shorten
+  case class Shortened(addressPart: UByte, shorterAddress: Address) extends Shorten
+
+  def shorten: Shorten =
     if length == 0 then
-      NotTakenAddressEmpty
+      NotShortened
     else
-      Taken(
-        index = indices.head,
-        shorterAddress = new Instance(indices.tail)
+      Shortened(
+        addressPart = indices.head,
+        shorterAddress = new Address(indices.tail)
       )
 
-  override def compare(that: Instance): Int =
+  def shorter(that: Address): Boolean =
+    this.length < that.length
+
+  def longer(that: Address): Boolean =
+    this.length > that.length
+
+  def isEmpty: Boolean =
+    length == 0
+
+  override def compare(that: Address): Int =
     val trimmedThis = this.trimBig
     val trimmedThat = that.trimBig
     if trimmedThis.length != trimmedThat.length then
@@ -97,5 +124,5 @@ class Instance(
 
   override def equals(that: Any): Boolean =
     that match
-      case that: Instance => compare(that) == 0
+      case that: Address => compare(that) == 0
       case _ => false

@@ -1,14 +1,13 @@
-package memmemov.bing.block
+package memmemov.bing
 
-import memmemov.bing.block.Instance
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.scalanative.unsigned.UnsignedRichInt
 
-class Suite extends AnyFunSuite:
+class BlockSuite extends AnyFunSuite:
 
   test("Read a byte from a block") {
-    val block = new Instance
+    val block = new Block
     (
       for {
         index <- 0 to 255

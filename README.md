@@ -7,20 +7,21 @@ No thread safety is at your disposal.
 Start with:
 
 ```scala
-import memmemov.bing.{address, memory}
+import memmemov.bing.{Address, Memory}
+
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-val memory = new memory.Instance
+val addresses = new Memory
 val firstAddress = memory.start
 
-memory.append(firstAddress) match
-  case memory.Appended(secondAddress) =>
-    memory.append(secondAddress)
-    ()
-  case _ => 
-    ()
+addresses.append(firstAddress) match
+    case memory.Appended(secondAddress) =>
+        addresses.append(secondAddress)
+        ()
+    case _ =>
+      ()
 
-memory.foreach{ a: address.Instance => 
+memory.foreach { a: Address =>
   a.foreach { b: UByte =>
     // use the byte
     ()
