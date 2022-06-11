@@ -3,12 +3,11 @@ package memmemov.bing
 import scala.annotation.tailrec
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-class Element(
+private[bing] class Element(
   private val level: Level
 ):
 
   private lazy val store: Store = level.createStore
-
   private lazy val stock: Stock = level.createStock
 
   sealed trait Write
@@ -22,7 +21,6 @@ class Element(
         NotWritten
       case destination.Shortened(destinationPart, shorterDestination) =>
         if shorterDestination.isEmpty then
-
           level.padBig(content) match
             case level.NotPaddedBigAlreadyGreater =>
               NotWritten

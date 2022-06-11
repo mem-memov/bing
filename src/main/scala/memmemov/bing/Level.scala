@@ -2,7 +2,7 @@ package memmemov.bing
 
 import scala.scalanative.unsigned.UByte
 
-class Level(
+private[bing] class Level(
   private val number: Int = 0
 ):
 

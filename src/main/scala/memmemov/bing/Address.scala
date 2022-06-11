@@ -4,21 +4,21 @@ import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
 class Address(
   private[Address] val indices: List[UByte]
-) extends Ordered[Address]:
+) extends Entry with Ordered[Address]:
 
   val length: Int = indices.length
 
-  def trimBig: Address =
+  private[bing] def trimBig: Address =
     new Address(
       indices.dropWhile(_ == UByte.MinValue)
     )
 
-  sealed trait PadBig
-  case class PaddedBig(padded: Address) extends PadBig
-  object NotPaddedBigAlreadyGreater extends PadBig
+  private[bing] sealed trait PadBig
+  private[bing] case class PaddedBig(padded: Address) extends PadBig
+  private[bing] object NotPaddedBigAlreadyGreater extends PadBig
 
-  def padBig(target: Int): PadBig =
-    
+  private[bing] def padBig(target: Int): PadBig =
+
     if length == target then
       PaddedBig(this)
     else
@@ -56,12 +56,12 @@ class Address(
 
     new Address(resultIndices)
 
-  sealed trait Write
-  object Written extends Write
-  object NotWrittenAddressEmpty extends Write
-  object NotWrittenAddressTooBig extends Write
+  private[bing] sealed trait Write
+  private[bing] object Written extends Write
+  private[bing] object NotWrittenAddressEmpty extends Write
+  private[bing] object NotWrittenAddressTooBig extends Write
 
-  def write(where: Block, what: UByte): Write =
+  private[bing] def write(where: Block, what: UByte): Write =
     length match
       case 0 =>
         NotWrittenAddressEmpty
@@ -71,12 +71,12 @@ class Address(
       case _ =>
         NotWrittenAddressTooBig
 
-  sealed trait Read
-  case class ReadResult(content: UByte) extends Read
-  object NotReadAddressEmpty extends Read
-  object NotReadAddressTooBig extends Read
+  private[bing] sealed trait Read
+  private[bing] case class ReadResult(content: UByte) extends Read
+  private[bing] object NotReadAddressEmpty extends Read
+  private[bing] object NotReadAddressTooBig extends Read
 
-  def read(where: Block): Read =
+  private[bing] def read(where: Block): Read =
     length match
       case 0 =>
         NotReadAddressEmpty
@@ -87,13 +87,13 @@ class Address(
       case _ =>
         NotReadAddressTooBig
 
-  def foreach(f: UByte => Unit): Unit = indices.foreach(f)
+  override def foreach(f: UByte => Unit): Unit = indices.foreach(f)
 
-  sealed trait Shorten
-  object NotShortened extends Shorten
-  case class Shortened(addressPart: UByte, shorterAddress: Address) extends Shorten
+  private[bing] sealed trait Shorten
+  private[bing] object NotShortened extends Shorten
+  private[bing] case class Shortened(addressPart: UByte, shorterAddress: Address) extends Shorten
 
-  def shorten: Shorten =
+  private[bing] def shorten: Shorten =
     if length == 0 then
       NotShortened
     else
@@ -102,10 +102,10 @@ class Address(
         shorterAddress = new Address(indices.tail)
       )
 
-  def shorter(that: Address): Boolean =
+  private[bing] def shorter(that: Address): Boolean =
     this.length < that.length
 
-  def longer(that: Address): Boolean =
+  private[bing] def longer(that: Address): Boolean =
     this.length > that.length
 
   def isEmpty: Boolean =

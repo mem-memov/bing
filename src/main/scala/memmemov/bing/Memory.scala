@@ -3,19 +3,14 @@ package memmemov.bing
 import scala.annotation.tailrec
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-class Memory:
+class Memory extends Inventory[Address]:
 
-  val start: Address = new Address(List(UByte.MinValue))
+  override val start: Address = new Address(List(UByte.MinValue))
 
   private var next: Address = start
   private lazy val root: Element = new Element(new Level)
 
-  sealed trait Append
-  case class Appended(destination: Address) extends Append
-  object NotAppended extends Append
-  object NotAppendedContentTooBig extends Append
-
-  def append(content: Address): Append =
+  override def append(content: Address): Append =
 
     val trimmedContent = content.trimBig
 
@@ -30,13 +25,7 @@ class Memory:
         case root.NotWritten =>
           NotAppended
 
-  sealed trait Update
-  object Updated extends Update
-  object NotUpdatedContentTooBig extends Update
-  object NotUpdatedDestinationTooBig extends Update
-  object NotUpdated extends Update
-
-  def update(destination: Address, content: Address): Update =
+  override def update(destination: Address, content: Address): Update =
 
     val trimmedDestination = destination.trimBig
     val trimmedContent = content.trimBig
@@ -53,18 +42,14 @@ class Memory:
           case root.NotWritten =>
             NotUpdated
 
-  sealed trait Read
-  case class ReadResult(content: Address) extends Read
-  object NotRead extends Read
-
-  def read(source: Address): Read =
+  override def read(source: Address): Read =
     root.read(source) match
       case root.ReadResult(content) =>
-        ReadResult(content)
+        ReadResult(content.trimBig)
       case root.NotRead =>
         NotRead
 
-  def foreach(f: Address => Unit): Unit =
+  override def foreach(f: Address => Unit): Unit =
 
     @tailrec
     def walk(f: Address => Unit, source: Address): Unit =

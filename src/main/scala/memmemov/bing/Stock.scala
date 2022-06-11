@@ -2,7 +2,7 @@ package memmemov.bing
 
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-class Stock(
+private[bing] class Stock(
   private val elements: Array[Element]
 ):
 

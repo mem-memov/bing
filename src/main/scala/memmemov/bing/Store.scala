@@ -2,7 +2,7 @@ package memmemov.bing
 
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-class Store(
+private[bing] class Store(
   private val blocks: Array[Block]
 ):
 
