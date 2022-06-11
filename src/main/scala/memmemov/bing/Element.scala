@@ -22,11 +22,16 @@ class Element(
         NotWritten
       case destination.Shortened(destinationPart, shorterDestination) =>
         if shorterDestination.isEmpty then
-          store.write(destinationPart, content) match
-            case store.Written =>
-              Written
-            case store.NotWritten =>
+
+          level.padBig(content) match
+            case level.NotPaddedBigAlreadyGreater =>
               NotWritten
+            case level.PaddedBig(paddedContent) =>
+              store.write(destinationPart, paddedContent) match
+                case store.Written =>
+                  Written
+                case store.NotWritten =>
+                  NotWritten
         else
           stock.write(destinationPart, shorterDestination, content) match
             case stock.Written =>

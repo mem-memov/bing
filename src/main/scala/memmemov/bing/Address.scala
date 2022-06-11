@@ -14,21 +14,23 @@ class Address(
     )
 
   sealed trait PadBig
-  case class PaddedBig(value: Address) extends PadBig
+  case class PaddedBig(padded: Address) extends PadBig
   object NotPaddedBigAlreadyGreater extends PadBig
 
-  def padBig(that: Address): PadBig =
-    val trimmedThis = this.trimBig
-    val trimmedThat = that.trimBig
-    if trimmedThis.length > trimmedThat.length then
-      NotPaddedBigAlreadyGreater
+  def padBig(target: Int): PadBig =
+    
+    if length == target then
+      PaddedBig(this)
     else
-      val n = trimmedThis.length - trimmedThat.length
-      PaddedBig(
-        value = new Address(
-          trimmedThis.indices.padTo(n, UByte.MinValue)
+      val trimmed = this.trimBig
+      if trimmed.length > target then
+        NotPaddedBigAlreadyGreater
+      else
+        PaddedBig(
+          padded = new Address(
+            trimmed.indices.padTo(target, UByte.MinValue)
+          )
         )
-      )
 
   def hasLength(length: Int): Boolean =
     this.length == length
