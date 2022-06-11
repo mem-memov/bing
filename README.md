@@ -12,7 +12,7 @@ import memmemov.bing
 
 import scala.scalanative.unsigned.{UByte, UnsignedRichInt}
 
-val inventory: bing.Inventory = new Memory
+val inventory: bing.Inventory[bing.Entry] = new Memory
 val firstEntry: bing.Entry = memory.start
 
 inventory.append(firstEntry) match
