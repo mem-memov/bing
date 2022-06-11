@@ -39,53 +39,47 @@ class AddressSuite extends AnyFunSuite:
     }
   }
 
-//  test("Create another address with some zero bytes at the head") {
-//
-//    val low = UByte.MinValue
-//    val high = UByte.MaxValue
-//
-//    List(
-//      (
-//        new Address(List(high)),
-//        new Address(List(high)),
-//        PaddedBig(new Address(List(high)))
-//      ),
-//      (
-//        new Address(List(high)),
-//        new Address(List(high, high)),
-//        PaddedBig(new Address(List(low, high)))
-//      ),
-//      (
-//        new Address(List(high)),
-//        new Address(List(high, high, high, high)),
-//        PaddedBig(new Address(List(low, low, low, high)))
-//      ),
-//      (
-//        new Address(List(high, high)),
-//        new Address(List(high)),
-//        NotPaddedBigAlreadyGreater
-//      ),
-//      (
-//        new Address(List()),
-//        new Address(List()),
-//        PaddedBig(new Address(List()))
-//      ),
-//      (
-//        new Address(List()),
-//        new Address(List(high, high, high, high)),
-//        PaddedBig(new Address(List(low, low, low, low)))
-//      ),
-//      (
-//        new Address(List()),
-//        new Address(List(low, low, low, high)),
-//        PaddedBig(new Address(List(low)))
-//      )
-//    ).foreach { case (original, example, expected) =>
-//      assert(
-//        original.padBig(example) == expected
-//      )
-//    }
-//  }
+  test("Create another address with some zero bytes at the head") {
+
+    val low = UByte.MinValue
+    val high = UByte.MaxValue
+
+    List(
+      (
+        new Address(List(high)),
+        0,
+        new Address(List(high)),
+        Option.empty[String]
+      ),
+      (
+        new Address(List(high)),
+        3,
+        new Address(List(low, low, high)),
+        Option.empty[String]
+      ),
+      (
+        new Address(List(high, low)),
+        3,
+        new Address(List(low, low, high, low)),
+        Option.empty[String]
+      ),
+      (
+        new Address(List(high, high, high)),
+        2,
+        new Address(List.empty),
+        Some("NotPaddedBigAlreadyGreater")
+      )
+    ).foreach { case (original, target, expected, failure) =>
+
+      original.padBig(target) match
+        case original.PaddedBig(padded) =>
+          assert(padded == expected)
+          assert(failure.isEmpty)
+        case original.NotPaddedBigAlreadyGreater =>
+          assert(failure.contains("NotPaddedBigAlreadyGreater"))
+
+    }
+  }
 
   test("Create another address without zero bytes at the head") {
 
