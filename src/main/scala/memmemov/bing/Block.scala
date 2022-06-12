@@ -6,13 +6,21 @@ import scala.scalanative.unsigned.{UByte, UnsignedRichInt, UnsignedRichLong}
 
 private[bing] class Block:
 
-  private lazy val bytePointer: Ptr[UByte] = malloc(Block.size).asInstanceOf[Ptr[UByte]]
-  
-  def read(origin: UByte): UByte = bytePointer(origin)
-  
-  def write(destination: UByte, content: UByte): Unit = bytePointer.update(destination, content)
+  private lazy val bytePointer: Ptr[UByte] =
 
-  def close(): Unit = free(bytePointer.asInstanceOf[Ptr[Byte]])
+    malloc(Block.size).asInstanceOf[Ptr[UByte]]
+  
+  def read(origin: UByte): UByte =
+
+    bytePointer(origin)
+  
+  def write(destination: UByte, content: UByte): Unit =
+
+    bytePointer.update(destination, content)
+
+  def close(): Unit =
+
+    free(bytePointer.asInstanceOf[Ptr[Byte]])
 
 object Block:
 

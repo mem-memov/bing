@@ -46,8 +46,20 @@ class AddressSuite extends AnyFunSuite:
 
     List(
       (
+        new Address(List.empty),
+        2,
+        new Address(List(low, low)),
+        Option.empty[String]
+      ),
+      (
+        new Address(List(low)),
+        3,
+        new Address(List(low, low ,low)),
+        Option.empty[String]
+      ),
+      (
         new Address(List(high)),
-        0,
+        1,
         new Address(List(high)),
         Option.empty[String]
       ),
@@ -72,9 +84,11 @@ class AddressSuite extends AnyFunSuite:
     ).foreach { case (original, target, expected, failure) =>
 
       original.padBig(target) match
+
         case original.PaddedBig(padded) =>
           assert(padded == expected)
           assert(failure.isEmpty)
+
         case original.NotPaddedBigAlreadyGreater =>
           assert(failure.contains("NotPaddedBigAlreadyGreater"))
     }
@@ -86,6 +100,14 @@ class AddressSuite extends AnyFunSuite:
     val high = UByte.MaxValue
 
     List(
+      (
+        new Address(List()),
+        new Address(List())
+      ),
+      (
+        new Address(List(low, low, low, low)),
+        new Address(List(low))
+      ),
       (
         new Address(List(high)),
         new Address(List(high))

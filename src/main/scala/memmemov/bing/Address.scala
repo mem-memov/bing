@@ -9,9 +9,10 @@ class Address(
   private[Address] lazy val length: Int = indices.length
 
   private[bing] def trimBig: Address =
-    new Address(
-      indices.dropWhile(_ == UByte.MinValue)
-    )
+
+    val trimmedIndices = indices.dropWhile(_ == UByte.MinValue)
+    val nonEmptyIndices = if trimmedIndices.isEmpty then List(UByte.MinValue) else trimmedIndices
+    new Address(nonEmptyIndices)
 
   private[bing] sealed trait PadBig
   private[bing] case class PaddedBig(padded: Address) extends PadBig
@@ -26,9 +27,10 @@ class Address(
       if trimmed.length > target then
         NotPaddedBigAlreadyGreater
       else
+        val padding = (0 to length - target).map(_ => UByte.MinValue).toList
         PaddedBig(
           padded = new Address(
-            trimmed.indices.padTo(target, UByte.MinValue)
+            padding ++ indices
           )
         )
 
@@ -91,3 +93,7 @@ class Address(
     that match
       case that: Address => compare(that) == 0
       case _ => false
+
+  override def toString: String =
+
+    indices.map(_.toInt.toString()).mkString("Address(", ",", ")")
