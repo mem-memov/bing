@@ -67,7 +67,9 @@ class Memory extends Inventory[Address]:
 
   override def nibble(f: UByte => Unit): Unit =
 
-    root.nibble(f, new Level)
+//    if root.nibble(f, new Level) then
+    ()
+      
 
   override def feed(content: UByte): Unit =
 
