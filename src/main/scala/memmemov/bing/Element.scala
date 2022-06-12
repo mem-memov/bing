@@ -57,26 +57,6 @@ private[bing] class Element(
             case stock.NotRead =>
               NotRead
 
-  def nibble(f: UByte => Unit, depth: Level): Unit =
-
-    if depth == level then
-      store.nibble(f)
-    else
-      if depth < level then
-        stock.nibble(f, depth)
-      else
-        ()
-
-  def feed(content: UByte, depth: Level): Unit =
-
-    if depth == level then
-      store.feed(content)
-    else
-      if depth < level then
-        stock.feed(content, depth)
-      else
-        ()
-
   def close(): Unit =
 
     store.close()

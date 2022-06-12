@@ -32,14 +32,6 @@ private[bing] class Stock(
       case element.NotRead =>
         NotRead
 
-  def nibble(f: UByte => Unit, depth: Level): Unit =
-
-    elements.foreach(_.nibble(f, depth))
-
-  def feed(content: UByte, depth: Level): Unit =
-
-    elements.foreach(_.feed(content, depth))
-
   def close(): Unit =
 
     elements.foreach(_.close())
