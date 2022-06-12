@@ -34,7 +34,7 @@ class AddressSuite extends AnyFunSuite:
   test("Address provides its length") {
     (0 to 255).map(n => List.empty[UByte].padTo(n * 100, n.toUByte)).foreach { indices =>
       assert(
-        new Address(indices).length == indices.length
+        new Address(indices).hasLength(indices.length)
       )
     }
   }
@@ -77,7 +77,6 @@ class AddressSuite extends AnyFunSuite:
           assert(failure.isEmpty)
         case original.NotPaddedBigAlreadyGreater =>
           assert(failure.contains("NotPaddedBigAlreadyGreater"))
-
     }
   }
 

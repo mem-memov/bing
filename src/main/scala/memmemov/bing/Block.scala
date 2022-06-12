@@ -8,10 +8,10 @@ private[bing] class Block:
 
   private lazy val bytePointer: Ptr[UByte] = malloc(Block.size).asInstanceOf[Ptr[UByte]]
   
-  def read(source: UByte): UByte = bytePointer(source)
+  def read(origin: UByte): UByte = bytePointer(origin)
   
   def write(destination: UByte, content: UByte): Unit = bytePointer.update(destination, content)
-  
+
   def close(): Unit = free(bytePointer.asInstanceOf[Ptr[Byte]])
 
 object Block:

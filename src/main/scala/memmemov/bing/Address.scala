@@ -6,7 +6,7 @@ class Address(
   private[Address] val indices: List[UByte]
 ) extends Entry with Ordered[Address]:
 
-  val length: Int = indices.length
+  private[Address] lazy val length: Int = indices.length
 
   private[bing] def trimBig: Address =
     new Address(
@@ -56,37 +56,6 @@ class Address(
 
     new Address(resultIndices)
 
-  private[bing] sealed trait Write
-  private[bing] object Written extends Write
-  private[bing] object NotWrittenAddressEmpty extends Write
-  private[bing] object NotWrittenAddressTooBig extends Write
-
-  private[bing] def write(where: Block, what: UByte): Write =
-    length match
-      case 0 =>
-        NotWrittenAddressEmpty
-      case 1 =>
-        where.write(indices.head, what)
-        Written
-      case _ =>
-        NotWrittenAddressTooBig
-
-  private[bing] sealed trait Read
-  private[bing] case class ReadResult(content: UByte) extends Read
-  private[bing] object NotReadAddressEmpty extends Read
-  private[bing] object NotReadAddressTooBig extends Read
-
-  private[bing] def read(where: Block): Read =
-    length match
-      case 0 =>
-        NotReadAddressEmpty
-      case 1 =>
-        ReadResult(
-          content = where.read(indices.head)
-        )
-      case _ =>
-        NotReadAddressTooBig
-
   override def foreach(f: UByte => Unit): Unit = indices.foreach(f)
 
   private[bing] sealed trait Shorten
@@ -101,12 +70,6 @@ class Address(
         addressPart = indices.head,
         shorterAddress = new Address(indices.tail)
       )
-
-  private[bing] def shorter(that: Address): Boolean =
-    this.length < that.length
-
-  private[bing] def longer(that: Address): Boolean =
-    this.length > that.length
 
   def isEmpty: Boolean =
     length == 0

@@ -1,5 +1,7 @@
 package memmemov.bing
 
+import scala.scalanative.unsigned.UByte
+
 trait Inventory[E]:
 
   val start: E
@@ -26,4 +28,12 @@ trait Inventory[E]:
   def read(source: E): Read
 
   def foreach(f: E => Unit): Unit
+
+  def nibble(f: UByte => Unit): Unit
+  
+  def feed(content: UByte): Unit
+  
+  def close(): Unit
+    
+    
   
